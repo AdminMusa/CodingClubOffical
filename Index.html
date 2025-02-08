@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodingClubOfficial Website</title>
+    <meta name="description" content="Join the ultimate Python coding competition with PenguineMod! No Scratch, just real coding.">
+    <meta name="keywords" content="coding, Python, competition, PenguineMod, programming">
+    <link rel="stylesheet" href="styles.css"> 
+    <link rel="icon" href="favicon.png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #282c34;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        header h1 {
+            font-size: 2.5em;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+            background-color: #ff9800;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #e68900;
+        }
+        .signin input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+    </style>
+    <script>
+        async function signIn() {
+            let username = document.getElementById('username').value;
+            let password = document.getElementById('password').value;
+            if (!username || !password) {
+                alert("Please enter username and password");
+                return;
+            }
+            let response = await fetch("http://localhost:3000/signin", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+            let result = await response.json();
+            if (result.success) {
+                localStorage.setItem('loggedInUser', username);
+                document.getElementById('userDisplay').innerText = "Signed in as: " + username;
+                document.getElementById('signInForm').style.display = 'none';
+                document.getElementById('loggedInSection').style.display = 'block';
+            } else {
+                alert("Invalid login");
+            }
+        }
+        function signOut() {
+            localStorage.removeItem('loggedInUser');
+            document.getElementById('signInForm').style.display = 'block';
+            document.getElementById('loggedInSection').style.display = 'none';
+        }
+        function checkLogin() {
+            let loggedInUser = localStorage.getItem('loggedInUser');
+            if (loggedInUser) {
+                document.getElementById('userDisplay').innerText = "Signed in as: " + loggedInUser;
+                document.getElementById('signInForm').style.display = 'none';
+                document.getElementById('loggedInSection').style.display = 'block';
+            }
+        }
+        async function submitProject() {
+            let projectLink = prompt("Enter your project link:");
+            let loggedInUser = localStorage.getItem('loggedInUser');
+            if (!loggedInUser) {
+                alert("You must be signed in to submit a project.");
+                return;
+            }
+            if (!projectLink) {
+                alert("Please enter a valid project link.");
+                return;
+            }
+            let response = await fetch("http://localhost:3000/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: loggedInUser, project: projectLink })
+            });
+            let result = await response.json();
+            alert(result.message);
+        }
+    </script>
+</head>
+<body onload="checkLogin()">
+    <header>
+        <div class="container">
+            <h1>CodingClubOfficial Website</h1>
+            <p>Only Python. No Scratch. Push your coding skills to the limit!</p>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Use PenguineMod</h2>
+            <p>Click the button below to access PenguineMod and start competing.</p>
+            <a href="https://studio.penguinmod.com/editor.html" class="button" target="_blank">Open PenguineMod</a>
+        </div>
+        <div class="container" id="signInForm">
+            <h2>Sign In</h2>
+            <input type="text" id="username" placeholder="Username" required><br>
+            <input type="password" id="password" placeholder="Password" required><br>
+            <button class="button" onclick="signIn()">Sign In</button>
+        </div>
+        <div class="container" id="loggedInSection" style="display:none;">
+            <p id="userDisplay"></p>
+            <button class="button" onclick="signOut()">Sign Out</button>
+            <h2>Submit Your Project</h2>
+            <button class="button" onclick="submitProject()">Submit Project</button>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 CodingClubOfficial. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>
